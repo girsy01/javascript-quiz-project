@@ -66,7 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /************  TIMER  ************/
 
-  let timer;
+  let timer = setInterval(() => {
+    
+    quiz.timeRemaining--;
+  }, 1000);
 
   /************  EVENT LISTENERS  ************/
 
@@ -182,3 +185,4 @@ document.addEventListener("DOMContentLoaded", () => {
     resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${questions.length} correct answers!`; // This value is hardcoded as a placeholder
   }
 });
+
