@@ -25,7 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Array with the quiz questions
   const questions = [
     new Question("What is 2 + 2?", ["3", "4", "5", "6"], "4", 1),
-    new Question("What is the capital of France?", ["Miami", "Paris", "Oslo", "Rome"], "Paris", 1),
+    new Question(
+      "What is the capital of France?",
+      ["Miami", "Paris", "Oslo", "Rome"],
+      "Paris",
+      1
+    ),
     new Question(
       "Who created JavaScript?",
       ["Plato", "Brendan Eich", "Lea Verou", "Bill Gates"],
@@ -52,24 +57,34 @@ document.addEventListener("DOMContentLoaded", () => {
   /************  SHOW INITIAL CONTENT  ************/
 
   // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
-  const minutes = Math.floor(quiz.timeRemaining / 60)
-    .toString()
-    .padStart(2, "0");
-  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+  updateRemainingTime();
+  function updateRemainingTime() {
+    const minutes = Math.floor(quiz.timeRemaining / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
 
-  // Display the time remaining in the time remaining container
-  const timeRemainingContainer = document.getElementById("timeRemaining");
-  timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+    // Display the time remaining in the time remaining container
+    const timeRemainingContainer = document.getElementById("timeRemaining");
+    timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  }
 
   // Show first question
   showQuestion();
 
   /************  TIMER  ************/
-
-  let timer = setInterval(() => {
-    
-    quiz.timeRemaining--;
-  }, 1000);
+  let timer;
+  setTimer();
+  function setTimer() {
+    timer = setInterval(() => {
+      quiz.timeRemaining--;
+      updateRemainingTime();
+      if (quiz.timeRemaining === 0) {
+        clearInterval(timer);
+        showResults();
+      }
+    }, 1000);
+  }
 
   /************  EVENT LISTENERS  ************/
 
@@ -105,13 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. Update the green progress bar
     // Update the green progress bar (div#progressBar) width so that it shows the percentage of questions answered
-    const percentage = ((quiz.currentQuestionIndex + 1) / questions.length) * 100;
+    const percentage =
+      ((quiz.currentQuestionIndex + 1) / questions.length) * 100;
     progressBar.style.width = `${percentage}%`; // This value is hardcoded as a placeholder
 
     // 3. Update the question count text
     // Update the question count (div#questionCount) show the current question out of total questions
 
-    questionCount.innerText = `Question ${quiz.currentQuestionIndex + 1} of ${questions.length}`; //  This value is hardcoded as a placeholder
+    questionCount.innerText = `Question ${quiz.currentQuestionIndex + 1} of ${
+      questions.length
+    }`; //  This value is hardcoded as a placeholder
 
     // 4. Create and display new radio input element with a label for each choice.
     // Loop through the current question `choices`.
@@ -164,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showResults() {
     // YOUR CODE HERE:
-
+    clearInterval(timer);
     const resetButton = document.querySelector("#restartButton");
     resetButton.addEventListener("click", () => {
       endView.style.display = "none";
@@ -173,6 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
       quiz.correctAnswers = 0;
       quiz.shuffleQuestions();
       showQuestion();
+      quiz.timeRemaining = quizDuration;
+      updateRemainingTime();
+      setTimer();
     });
     //
     // 1. Hide the quiz view (div#quizView)
@@ -185,4 +206,3 @@ document.addEventListener("DOMContentLoaded", () => {
     resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${questions.length} correct answers!`; // This value is hardcoded as a placeholder
   }
 });
-
